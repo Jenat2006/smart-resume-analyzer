@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="card shadow">
+
+    <div class="card-header bg-success text-white">
+
+        <h2>
+
+            Resume Analysis
+
+        </h2>
+
+    </div>
+
+    <div class="card-body">
+
+        <h4>
+
+            Uploaded File
+
+        </h4>
+
+        <p>
+
+            {{ filename }}
+
+        </p>
+
+        <hr>
+        <hr>
+        <hr>
+
+<h3>Resume Score</h3>
+
+<div class="progress" style="height:30px;">
+
+    <div
+        class="progress-bar bg-success"
+        role="progressbar"
+        style="width: {{ resume_score }}%;">
+
+        {{ resume_score }}/100
+
+    </div>
+<hr>
+
+<h3>Resume Improvement Suggestions</h3>
+
+<ul class="list-group">
+
+{% for suggestion in suggestions %}
+
+<li class="list-group-item">
+
+{{ suggestion }}
+
+</li>
+
+{% endfor %}
+
+</ul>
+</div>
+
+<br>
+
+<h3>Detected Skills</h3>
+<hr>
+
+<h3>Recommended Jobs</h3>
+
+<table class="table table-bordered">
+
+<thead>
+
+<tr>
+
+<th>Job Title</th>
+
+<th>ATS Match %</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+{% for job in recommended_jobs %}
+
+<tr>
+
+<td>{{ job.Job }}</td>
+<td>{{ job.Score }}%</td>
+
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+<div>
+
+{% for skill in skills %}
+
+<span class="badge bg-success m-1 p-2">
+
+{{ skill }}
+
+</span>
+
+{% endfor %}
+
+</div>
+        <hr>
+
+<h4>Preprocessed Text</h4>
+
+<textarea class="form-control" rows="12">
+{{ clean_text }}
+</textarea>
+
+        <h4>
+
+            Resume Text
+
+        </h4>
+
+        <textarea
+        class="form-control"
+        rows="18">
+
+{{ resume_text }}
+
+</textarea>
+
+    </div>
+
+</div>
+
+{% endblock %}
