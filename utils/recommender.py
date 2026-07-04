@@ -1,30 +1,32 @@
 import pandas as pd
-
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
 
 def recommend_jobs(resume_text):
 
+    # Load jobs
     jobs = pd.read_csv("jobs.csv")
 
-    job_titles = jobs["Job Title"].tolist()
+    job_titles = jobs["Job Title"]
 
-    job_skills = jobs["Skills"].tolist()
+    job_skills = jobs["Skills"]
 
-    # Resume + All Job Skills
-    documents = [resume_text] + job_skills
+    # Resume + Job descriptions
+    corpus = [resume_text] + job_skills.tolist()
 
-    # Convert text to vectors
-    vectorizer = TfidfVectorizer()
+    # TF-IDF
+    vectorizer = TfidfVectorizer(stop_words="english")
 
-    tfidf_matrix = vectorizer.fit_transform(documents)
+    tfidf_matrix = vectorizer.fit_transform(corpus)
 
-    # Compare resume with every job
+    # Similarity
     similarity = cosine_similarity(
         tfidf_matrix[0:1],
         tfidf_matrix[1:]
-    )[0]
+    )
+
+    similarity_scores = similarity.flatten()
 
     recommendations = []
 
@@ -34,7 +36,7 @@ def recommend_jobs(resume_text):
 
             "Job": job_titles[i],
 
-            "Score": round(similarity[i] * 100, 2)
+            "Score": round(similarity_scores[i] * 100, 2)
 
         })
 
@@ -45,4 +47,3 @@ def recommend_jobs(resume_text):
     )
 
     return recommendations[:5]
-          
