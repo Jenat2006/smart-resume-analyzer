@@ -3,47 +3,67 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
 
+# ==========================
+# Job Recommendation Engine
+# ==========================
+
 def recommend_jobs(resume_text):
 
-    # Load jobs
-    jobs = pd.read_csv("jobs.csv")
+    try:
 
-    job_titles = jobs["Job Title"]
+        jobs = pd.read_csv("jobs.csv")
 
-    job_skills = jobs["Skills"]
+    except Exception:
 
-    # Resume + Job descriptions
-    corpus = [resume_text] + job_skills.tolist()
+        return []
 
-    # TF-IDF
-    vectorizer = TfidfVectorizer(stop_words="english")
+    # Check required columns
+    if "Job" not in jobs.columns or "Skills" not in jobs.columns:
+        return []
 
-    tfidf_matrix = vectorizer.fit_transform(corpus)
+    # Resume + Job Skills
+    documents = [resume_text]
 
-    # Similarity
-    similarity = cosine_similarity(
-        tfidf_matrix[0:1],
-        tfidf_matrix[1:]
+    documents.extend(
+        jobs["Skills"].fillna("").tolist()
     )
 
-    similarity_scores = similarity.flatten()
+    # TF-IDF Vectorizer
+    vectorizer = TfidfVectorizer(stop_words="english")
 
+    vectors = vectorizer.fit_transform(documents)
+
+    # Resume Vector
+    resume_vector = vectors[0]
+
+    # Job Vectors
+    job_vectors = vectors[1:]
+
+    similarity = cosine_similarity(
+        resume_vector,
+        job_vectors
+    ).flatten()
+
+    jobs["Score"] = (similarity * 100).round(2)
+
+    jobs = jobs.sort_values(
+        by="Score",
+        ascending=False
+    )
+
+    # Top 5 Jobs
     recommendations = []
 
-    for i in range(len(job_titles)):
+    for _, row in jobs.head(5).iterrows():
 
         recommendations.append({
 
-            "Job": job_titles[i],
+            "Job": row["Job"],
 
-            "Score": round(similarity_scores[i] * 100, 2)
+            "Score": float(row["Score"]),
+
+            "Skills": row["Skills"]
 
         })
 
-    recommendations = sorted(
-        recommendations,
-        key=lambda x: x["Score"],
-        reverse=True
-    )
-
-    return recommendations[:5]
+    return recommendations

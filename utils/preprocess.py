@@ -1,26 +1,53 @@
 import re
-import nltk
-from nltk.corpus import stopwords
+import string
+import spacy
 
-# Download stopwords (first time only)
-nltk.download('stopwords')
+# Load spaCy English model
+nlp = spacy.load("en_core_web_sm")
 
-stop_words = set(stopwords.words('english'))
 
 def preprocess_text(text):
+    """
+    Clean and preprocess resume text
+    """
 
     # Convert to lowercase
     text = text.lower()
 
-    # Remove punctuation and special characters
-    text = re.sub(r'[^a-zA-Z0-9\s]', ' ', text)
+    # Remove URLs
+    text = re.sub(r"http\S+|www\S+", " ", text)
+
+    # Remove email addresses
+    text = re.sub(r"\S+@\S+", " ", text)
+
+    # Remove phone numbers
+    text = re.sub(r"\+?\d[\d\s\-]{8,}\d", " ", text)
+
+    # Remove punctuation
+    text = text.translate(str.maketrans("", "", string.punctuation))
 
     # Remove extra spaces
-    text = re.sub(r'\s+', ' ', text)
+    text = re.sub(r"\s+", " ", text).strip()
 
-    # Remove stopwords
-    words = text.split()
+    # NLP Processing
+    doc = nlp(text)
 
-    filtered_words = [word for word in words if word not in stop_words]
+    cleaned_words = []
 
-    return " ".join(filtered_words)
+    for token in doc:
+
+        if token.is_stop:
+            continue
+
+        if token.is_punct:
+            continue
+
+        if token.like_num:
+            continue
+
+        lemma = token.lemma_.strip()
+
+        if len(lemma) > 1:
+            cleaned_words.append(lemma)
+
+    return " ".join(cleaned_words)

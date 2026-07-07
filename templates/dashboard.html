@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container">
+
+    <div class="card shadow-lg border-0">
+
+        <div class="card-header bg-dark text-white">
+
+            <h2>
+                User Dashboard
+            </h2>
+
+        </div>
+
+        <div class="card-body">
+
+            <h5>
+
+                Welcome,
+
+                <span class="text-primary">
+
+                    {{ email }}
+
+                </span>
+
+            </h5>
+
+            <hr>
+
+            <h4>
+
+                Resume Analysis History
+
+            </h4>
+
+            {% if history %}
+
+            <table class="table table-striped table-bordered mt-3">
+
+                <thead class="table-primary">
+
+                    <tr>
+
+                        <th>#</th>
+
+                        <th>Resume File</th>
+
+                        <th>Resume Score</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for item in history %}
+
+                    <tr>
+
+                        <td>{{ loop.index }}</td>
+
+                        <td>{{ item[0] }}</td>
+
+                        <td>
+
+                            <span class="badge bg-success">
+
+                                {{ item[1] }}/100
+
+                            </span>
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+            {% else %}
+
+            <div class="alert alert-warning mt-3">
+
+                No resume history found.
+
+            </div>
+
+            {% endif %}
+
+            <div class="text-center mt-4">
+
+                <a
+                    href="/upload"
+                    class="btn btn-success btn-lg">
+
+                    Analyze Another Resume
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

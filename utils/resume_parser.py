@@ -3,40 +3,68 @@ import pdfplumber
 from docx import Document
 
 
-def extract_text_from_pdf(pdf_path):
+# ==========================
+# Extract Text From PDF
+# ==========================
+
+def extract_pdf_text(filepath):
+
     text = ""
 
-    with pdfplumber.open(pdf_path) as pdf:
-        for page in pdf.pages:
-            page_text = page.extract_text()
+    try:
 
-            if page_text:
-                text += page_text + "\n"
+        with pdfplumber.open(filepath) as pdf:
+
+            for page in pdf.pages:
+
+                page_text = page.extract_text()
+
+                if page_text:
+                    text += page_text + "\n"
+
+    except Exception as e:
+
+        print("PDF Error :", e)
 
     return text
 
 
-def extract_text_from_docx(docx_path):
+# ==========================
+# Extract Text From DOCX
+# ==========================
 
-    doc = Document(docx_path)
+def extract_docx_text(filepath):
 
     text = ""
 
-    for para in doc.paragraphs:
-        text += para.text + "\n"
+    try:
+
+        doc = Document(filepath)
+
+        for para in doc.paragraphs:
+
+            text += para.text + "\n"
+
+    except Exception as e:
+
+        print("DOCX Error :", e)
 
     return text
 
 
-def extract_resume_text(file_path):
+# ==========================
+# Main Function
+# ==========================
 
-    extension = os.path.splitext(file_path)[1].lower()
+def extract_resume_text(filepath):
+
+    extension = os.path.splitext(filepath)[1].lower()
 
     if extension == ".pdf":
-        return extract_text_from_pdf(file_path)
+        return extract_pdf_text(filepath)
 
     elif extension == ".docx":
-        return extract_text_from_docx(file_path)
+        return extract_docx_text(filepath)
 
     else:
         return ""
